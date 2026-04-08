@@ -100,4 +100,75 @@ frases = [
 ]
 
 if not st.session_state.auth:
-    # DISEÑO DEL LOGIN REFORM
+    # DISEÑO DEL LOGIN REFORMADO
+    st.markdown("<div class='login-card'>", unsafe_allow_html=True)
+    
+    # Cabecera
+    st.markdown("<p class='brand-title'>ColorMaster</p>", unsafe_allow_html=True)
+    st.markdown("<p class='welcome-text'>¡Bienvenido a tu taller creativo!</p>", unsafe_allow_html=True)
+    
+    # Frase del día
+    frase_hoy = random.choice(frases)
+    st.markdown(f"<div class='phrase-box'>{frase_hoy}</div>", unsafe_allow_html=True)
+    
+    # Sección de Novedades
+    st.markdown("<span class='news-badge'>NOVEDADES v2.0</span>", unsafe_allow_html=True)
+    st.markdown("""
+        <p style='font-size: 14px; color: #8E5B5B; margin-bottom: 25px;'>
+        ✨ <b>Nuevo modo Estética:</b> Ahora analizamos tratamientos de piel.<br>
+        🎨 <b>Fórmulas precisas:</b> IA entrenada en las últimas cartas de color.
+        </p>
+    """, unsafe_allow_html=True)
+    
+    # Input y Botón
+    api_key_input = st.text_input("Introduce tu Licencia Digital:", type="password", placeholder="Clave AIza...")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("ABRIR EL SALÓN ✨"):
+        if api_key_input:
+            st.session_state.api_key = api_key_input
+            st.session_state.auth = True
+            st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+else:
+    # 3. INTERFAZ DE TRABAJO (DENTRO)
+    with st.sidebar:
+        st.markdown("<h2 style='color: #8E5B5B; text-align: center;'>Menú Pro 🍬</h2>", unsafe_allow_html=True)
+        st.divider()
+        marca = st.selectbox("Línea de trabajo:", ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Casmara", "Otra"])
+        especialidad = st.radio("Especialidad:", ["Colorimetría", "Estética Corporal/Facial", "Tricología"])
+        st.divider()
+        if st.button("Cerrar Sesión"):
+            st.session_state.auth = False
+            st.rerun()
+
+    st.markdown(f"### 🪄 {especialidad} | {marca}")
+    
+    try:
+        genai.configure(api_key=st.session_state.api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+
+        for m in st.session_state.messages:
+            with st.chat_message(m["role"]):
+                st.markdown(m["content"])
+
+        if prompt := st.chat_input("Dime, ¿qué caso tenemos hoy?"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            contexto = f"Eres un experto senior en {especialidad}. Usas la marca {marca}. Tono: Elegante, experto y amable. Responde técnicamente: {prompt}"
+            
+            with st.spinner("Preparando mezcla..."):
+                response = model.generate_content(contexto)
+            
+            with st.chat_message("assistant"):
+                st.markdown(response.text)
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
+                
+    except Exception as e:
+        st.error(f"Error: {e}")
