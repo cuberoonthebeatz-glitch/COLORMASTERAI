@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+from google.api_core import client_options
 
 st.set_page_config(page_title="ColorMaster AI", page_icon="💇‍♀️")
 
@@ -12,10 +13,12 @@ with st.sidebar:
 
 if api_key:
     try:
-        genai.configure(api_key=api_key)
+        # CONFIGURACIÓN FORZADA PARA EVITAR EL ERROR 404
+        options = client_options.ClientOptions(api_endpoint="generativelanguage.googleapis.com")
+        genai.configure(api_key=api_key, client_options=options)
         
-        # Esta línea es la clave: forzamos el modelo estable
-        model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+        # Intentamos con el modelo Pro que es el más compatible
+        model = genai.GenerativeModel('gemini-1.5-pro')
 
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -24,20 +27,18 @@ if api_key:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-        if prompt := st.chat_input("Escribe aquí..."):
+        if prompt := st.chat_input("Escribe aquí tu consulta..."):
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            # Respuesta de la IA
-            response = model.generate_content(f"Actúa como colorista experto de {marca}: {prompt}")
+            response = model.generate_content(f"Eres un experto en peluquería de {marca}. Responde: {prompt}")
             
             with st.chat_message("assistant"):
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
                 
     except Exception as e:
-        # Si falla, nos dirá exactamente por qué
-        st.error(f"Aún tenemos un detalle: {e}")
+        st.error(f"Error detectado: {e}")
 else:
-    st.warning("👈 Introduce la clave para empezar.")
+    st.warning("👈 Introduce la clave para activar el sistema.")
