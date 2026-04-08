@@ -1,92 +1,108 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. CONFIGURACIÓN TÉCNICA
-st.set_page_config(page_title="ColorMaster Pro", page_icon="🎨", layout="wide")
+# 1. CONFIGURACIÓN VISUAL (GUMMY CHIC)
+st.set_page_config(page_title="ColorMaster Pro", page_icon="🍭", layout="centered")
 
-# CSS para maximizar el espacio y dar estilo profesional
+# CSS para el look "Esponjoso y Moderno"
 st.markdown("""
     <style>
-    /* Eliminar espacios blancos superiores */
-    .block-container {padding-top: 1rem; padding-bottom: 0rem; max-width: 95%;}
-    header {visibility: hidden;}
-    #MainMenu {visibility: hidden;}
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
     
-    /* Fondo y texto */
-    .stApp {background-color: #f8f9fa;}
-    
-    /* Input de login más profesional */
-    .login-container {
-        max-width: 400px;
-        margin: 100px auto;
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    html, body, [class*="css"] {
+        font-family: 'Rubik', sans-serif !important;
+        background-color: #FEF9F9; /* Fondo rosa nube muy suave */
     }
     
-    /* Chat más ancho y limpio */
-    .stChatMessage {background-color: white !important; border: 1px solid #eee !important;}
+    header, footer {visibility: hidden;}
+    
+    /* Efecto Esponjoso General */
+    .gummy-element {
+        border-radius: 20px;
+        box-shadow: 0 8px 16px rgba(142, 91, 91, 0.1); /* Sombra suave y difuminada */
+        border: 2px solid #FFF1F1;
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .gummy-element:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Login Box Gummy */
+    .login-container {
+        max-width: 400px;
+        margin: 80px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 10px 20px rgba(142, 91, 91, 0.15);
+        text-align: center;
+        border: 3px solid #FADADD; /* Rosa palo suave */
+    }
+    
+    /* Títulos Diferentes */
+    .main-title {
+        color: #8E5B5B;
+        font-weight: 700;
+        font-size: 32px;
+        margin-bottom: 5px;
+    }
+    
+    .subtitle {
+        color: #D4A373; /* Dorado suave */
+        font-weight: 400;
+        font-size: 18px;
+        margin-bottom: 25px;
+        font-style: italic;
+    }
+    
+    /* Botones Gummy (Vibrantes pero soft) */
+    .stButton>button {
+        background: linear-gradient(135deg, #FFC0CB 0%, #FFB6C1 100%); /* Rosa chicle suave */
+        color: #8E5B5B !important;
+        border-radius: 25px !important;
+        border: none;
+        padding: 12px 30px !important;
+        font-weight: 600;
+        width: 100%;
+        box-shadow: 0 5px 10px rgba(255, 182, 193, 0.4);
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .stButton>button:hover {
+        transform: scale(1.03);
+        box-shadow: 0 7px 14px rgba(255, 182, 193, 0.5);
+    }
+    
+    /* Inputs Rounded */
+    .stTextInput>div>div>input {
+        border-radius: 20px;
+        border: 2px solid #FADADD;
+        padding: 10px;
+    }
+    
+    /* Chat Messages Gummy */
+    .stChatMessage {
+        border-radius: 20px !important;
+        margin-bottom: 12px;
+        border: 1px solid #FFF1F1 !important;
+        box-shadow: 0 4px 8px rgba(142, 91, 91, 0.05);
+    }
+    
+    /* Estilo barra lateral */
+    section[data-testid="stSidebar"] {
+        background-color: #FFF1F1 !important;
+        border-right: 2px solid #FADADD;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. SISTEMA DE ACCESO
+# 2. SISTEMA DE ACCESO GUMMY
 if 'auth' not in st.session_state:
     st.session_state.auth = False
 
 if not st.session_state.auth:
     st.markdown("<div class='login-container'>", unsafe_allow_html=True)
-    st.subheader("🔐 Acceso ColorMaster Pro")
-    api_key_input = st.text_input("Licencia:", type="password", placeholder="Introduce tu API Key...")
-    if st.button("ENTRAR"):
-        if api_key_input:
-            st.session_state.api_key = api_key_input
-            st.session_state.auth = True
-            st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
-
-else:
-    # 3. INTERFAZ DE TRABAJO (MAXIMIZADA)
-    with st.sidebar:
-        st.title("⚙️ Ajustes")
-        marca = st.selectbox("Marca:", ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Casmara", "Otra"])
-        especialidad = st.radio("Modo:", ["Colorimetría", "Estética", "Tricología"])
-        st.divider()
-        if st.button("Cerrar Sesión"):
-            st.session_state.auth = False
-            st.rerun()
-
-    # Título directo
-    st.markdown(f"### 🤖 Asistente {especialidad} | {marca}")
-    
-    try:
-        genai.configure(api_key=st.session_state.api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-
-        # Mostrar chat
-        for m in st.session_state.messages:
-            with st.chat_message(m["role"]):
-                st.markdown(m["content"])
-
-        # Entrada de texto (Chat)
-        if prompt := st.chat_input("Escribe tu caso técnico..."):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
-
-            # Prompt técnico optimizado
-            contexto = f"Eres un experto colorista y esteticista de alto nivel. Marca: {marca}. Especialidad: {especialidad}. Responde de forma técnica, precisa y breve. {prompt}"
-            
-            # Generar respuesta
-            with st.spinner("Analizando..."):
-                response = model.generate_content(contexto)
-            
-            with st.chat_message("assistant"):
-                st.markdown(response.text)
-                st.session_state.messages.append({"role": "assistant", "content": response.text})
-                
-    except Exception as e:
-        st.error(f"Error: {e}")
+    st.image("https://cdn-icons-png.flaticon.com/512/3465/3465066.png", width=70)
+    st.markdown("<p class='main-title'>ColorMaster Pro</p>", unsafe_allow_html=True)
+    st.markdown("<p class='subtitle'>Tu rincón dulce de creatividad</p>", unsafe_allow
