@@ -1,170 +1,150 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. CONFIGURACIÓN DE ÉLITE
-st.set_page_config(page_title="ColorMaster Royale", page_icon="💎", layout="wide", initial_sidebar_state="collapsed")
+# 1. CONFIGURACIÓN DE IMPACTO
+st.set_page_config(page_title="ColorMaster X", page_icon="🔥", layout="wide")
 
-# 2. EL MOTOR DE IDENTIDAD (CSS RADICAL)
+# 2. ESTÉTICA RADICAL (NEO-POP INDUSTRIAL)
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Plus+Jakarta+Sans:wght@300;400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap');
     
-    :root {
-        --accent: #FF4D80;
-        --gold: #D4A373;
-        --glass: rgba(255, 255, 255, 0.85);
-    }
-
-    /* Fondo Animado (Para que no sea triste/estático) */
+    /* Fondo con Personalidad */
     .stApp {
-        background: linear-gradient(-45deg, #FFF5F7, #FDFCFB, #F8E1E7, #FFFFFF);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        background-color: #0F0F0F;
+        background-image: radial-gradient(#1a1a1a 2px, transparent 2px);
+        background-size: 30px 30px;
+        font-family: 'Space Grotesk', sans-serif;
+        color: white;
     }
 
-    header, footer, [data-testid="stSidebarNav"] {display: none !important;}
+    header, footer {visibility: hidden;}
 
-    /* Logo con Personalidad */
-    .brand-header {
-        font-family: 'Playfair Display', serif;
-        font-size: 60px;
-        font-weight: 900;
-        background: linear-gradient(90deg, #1A1A1A, #FF4D80);
+    /* Logo Explosivo */
+    .logo-vanguard {
+        font-family: 'Syncopate', sans-serif;
+        font-size: 80px;
+        line-height: 0.8;
+        background: linear-gradient(135deg, #FF0055, #FF5500);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        letter-spacing: -2px;
-        margin-bottom: 0px;
-    }
-
-    /* Tarjetas "Esponjosas" con Brillo de Cristal */
-    .card-royale {
-        background: var(--glass);
-        backdrop-filter: blur(20px);
-        border-radius: 35px;
-        padding: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 20px 40px rgba(255, 77, 128, 0.08);
         margin-bottom: 20px;
+        text-transform: uppercase;
     }
 
-    /* Botones Neumórficos / Chuchería */
+    /* Paneles de Neón */
+    .neon-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.1);
+    }
+
+    /* Botones que "Explotan" */
     .stButton>button {
-        background: #1A1A1A !important;
+        background: #FF0055 !important;
         color: white !important;
-        border-radius: 25px !important;
         border: none !important;
-        padding: 1.2rem 2rem !important;
-        font-weight: 700 !important;
-        font-size: 16px !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+        border-radius: 10px !important;
+        font-family: 'Syncopate', sans-serif !important;
+        font-size: 14px !important;
+        padding: 20px !important;
+        width: 100% !important;
+        transition: 0.3s !important;
     }
 
     .stButton>button:hover {
-        transform: scale(1.05) translateY(-5px) !important;
-        background: var(--accent) !important;
-        box-shadow: 0 15px 30px rgba(255, 77, 128, 0.4) !important;
+        background: #FF5500 !important;
+        box-shadow: 0 0 30px #FF0055 !important;
+        transform: scale(1.02);
     }
 
-    /* Chat Estilo Burbuja Suave */
+    /* Chat Estilo Cyberpunk */
     .stChatMessage {
-        border-radius: 30px !important;
-        border: none !important;
-        background: white !important;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.02) !important;
-        margin-bottom: 15px;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-left: 5px solid #FF0055 !important;
+        border-radius: 10px !important;
+        margin-bottom: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. LÓGICA DE PERSISTENCIA
+# 3. LÓGICA DE DATOS
 if 'auth' not in st.session_state: st.session_state.auth = False
 if 'clientes' not in st.session_state: st.session_state.clientes = []
 
-# 4. LOGIN CON "CHICHA"
+# 4. LOGIN RADICAL
 if not st.session_state.auth:
-    col_l, col_c, col_r = st.columns([1, 1.5, 1])
-    with col_c:
-        st.markdown("<div style='text-align:center; margin-top:15vh;'>", unsafe_allow_html=True)
-        st.markdown("<p class='brand-header'>ColorMaster</p>", unsafe_allow_html=True)
-        st.markdown("<p style='letter-spacing:5px; color:#8E5B5B; font-weight:700; margin-top:-15px;'>ULTRA ROYALE</p>", unsafe_allow_html=True)
-        
-        st.markdown("<div class='card-royale'>", unsafe_allow_html=True)
-        api_key = st.text_input("LICENSE_KEY", type="password", placeholder="•••• •••• ••••")
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("DESBLOQUEAR ACCESO ✨"):
+    col1, col2 = st.columns([1.5, 1])
+    with col1:
+        st.markdown("<div style='margin-top:10vh;'>", unsafe_allow_html=True)
+        st.markdown("<p class='logo-vanguard'>COLOR<br>MASTER<br>X</p>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color:#FF0055;'>FUTURE OF BEAUTY. NOW.</h3>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    with col2:
+        st.markdown("<div class='neon-panel' style='margin-top:15vh;'>", unsafe_allow_html=True)
+        api_key = st.text_input("ENTER API KEY", type="password")
+        if st.button("UNLOCK SYSTEM"):
             if api_key:
                 st.session_state.api_key = api_key
                 st.session_state.auth = True
                 st.rerun()
-        st.markdown("</div></div>", unsafe_allow_html=True)
-
-else:
-    # 5. DASHBOARD DINÁMICO
-    st.markdown("<p class='brand-header' style='font-size:35px;'>ColorMaster</p>", unsafe_allow_html=True)
-    
-    col_nav, col_main = st.columns([1.2, 3], gap="large")
-
-    with col_nav:
-        st.markdown("<div class='card-royale'>", unsafe_allow_html=True)
-        st.markdown("### 🛠️ Workspace")
-        marca = st.selectbox("Línea técnica:", ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Otra"])
-        
-        with st.expander("➕ NUEVA CLIENTE", expanded=False):
-            nombre = st.text_input("Nombre")
-            notas = st.text_area("Notas Técnicas")
-            if st.button("REGISTRAR"):
-                if nombre:
-                    st.session_state.clientes.append({"n": nombre, "h": notas})
-                    st.rerun()
-        
-        st.divider()
-        st.markdown("### 📋 Agenda")
-        for c in st.session_state.clientes:
-            st.markdown(f"**{c['n']}**")
-            st.caption(f"📝 {c['h']}")
-            
-        if st.button("SALIR"):
-            st.session_state.auth = False
-            st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with col_main:
-        # SISTEMA DE IA INTEGRADO
-        st.markdown("<div class='card-royale' style='height: 700px; display: flex; flex-direction: column;'>", unsafe_allow_html=True)
-        st.markdown("#### 🤖 Consulta IA Senior")
+else:
+    # 5. WORKSPACE DINÁMICO
+    st.markdown("<p class='logo-vanguard' style='font-size:30px;'>CMX</p>", unsafe_allow_html=True)
+    
+    c_side, c_main = st.columns([1, 2.5])
+
+    with c_side:
+        with st.container(border=True):
+            st.markdown("### 🎚️ CONTROL")
+            marca = st.selectbox("MARCA", ["L'Oréal", "Wella", "Schwarzkopf", "Redken"])
+            
+            with st.expander("👤 AGENDAR CLIENTE"):
+                n = st.text_input("NOMBRE")
+                h = st.text_area("HISTORIAL")
+                if st.button("GUARDAR"):
+                    st.session_state.clientes.append({"n": n, "h": h})
+            
+            st.divider()
+            for cli in st.session_state.clientes:
+                st.markdown(f"🔴 **{cli['n']}**")
+            
+            if st.button("LOGOUT"):
+                st.session_state.auth = False
+                st.rerun()
+
+    with c_main:
+        st.markdown("<div class='neon-panel'>", unsafe_allow_html=True)
+        st.markdown("#### 💬 CONEXIÓN IA ACTIVA")
         
+        # Intentar respuesta forzada
         try:
             genai.configure(api_key=st.session_state.api_key)
+            # USAMOS EL MODELO FLASH POR DEFECTO
             model = genai.GenerativeModel('gemini-1.5-flash')
             
             if "msgs" not in st.session_state: st.session_state.msgs = []
             
-            chat_box = st.container(height=500, border=False)
-            with chat_box:
-                for m in st.session_state.msgs:
-                    with st.chat_message(m["role"]): st.markdown(m["content"])
+            for m in st.session_state.msgs:
+                with st.chat_message(m["role"]): st.markdown(m["content"])
 
-            if p := st.chat_input("¿Qué mezcla o diagnóstico hacemos?"):
+            if p := st.chat_input("¿Qué caso vamos a destruir hoy?"):
                 st.session_state.msgs.append({"role": "user", "content": p})
-                with chat_box:
-                    with st.chat_message("user"): st.markdown(p)
+                with st.chat_message("user"): st.markdown(p)
                 
-                res = model.generate_content(f"Mejor experto colorista del mundo. Marca {marca}. Responde pro: {p}")
+                # Respuesta de la IA
+                response = model.generate_content(f"Actúa como el mejor colorista del mundo. Marca {marca}. Respuesta corta y técnica: {p}")
                 
-                st.session_state.msgs.append({"role": "assistant", "content": res.text})
-                with chat_box:
-                    with st.chat_message("assistant"): st.markdown(res.text)
+                if response:
+                    st.session_state.msgs.append({"role": "assistant", "content": response.text})
+                    with st.chat_message("assistant"): st.markdown(response.text)
+                else:
+                    st.error("La IA no ha podido generar respuesta. Revisa tu clave.")
                     
         except Exception as e:
-            st.error(f"Sistema: {e}")
+            st.error(f"ERROR DE CONEXIÓN: {e}")
         st.markdown("</div>", unsafe_allow_html=True)
-        
