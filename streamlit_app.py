@@ -11,9 +11,12 @@ with st.sidebar:
 
 if api_key:
     try:
+        # Forzamos la configuración básica
         genai.configure(api_key=api_key)
-        # Usamos el modelo 'gemini-1.5-flash' que es el actual
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # CAMBIO CLAVE: Usamos el modelo 'gemini-pro' que es el más estable 
+        # y compatible con llaves nuevas
+        model = genai.GenerativeModel('gemini-pro')
 
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -27,13 +30,15 @@ if api_key:
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            response = model.generate_content(f"Eres experto en peluquería de {marca}. {prompt}")
+            # Generamos la respuesta
+            response = model.generate_content(f"Actúa como experto colorista de {marca}. {prompt}")
             
             with st.chat_message("assistant"):
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
                 
     except Exception as e:
-        st.error(f"Error: {e}")
+        # Si esto falla, el error nos dirá algo nuevo
+        st.error(f"Nota del sistema: {e}")
 else:
-    st.warning("👈 Pega tu nueva clave a la izquierda.")
+    st.warning("👈 Introduce tu nueva clave para activar.")
