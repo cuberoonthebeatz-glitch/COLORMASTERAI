@@ -114,4 +114,82 @@ else:
     # 5. EL DASHBOARD PROFESIONAL
     st.markdown("<p class='logo-text' style='font-size:40px; text-align:left;'>ColorMaster</p>", unsafe_allow_html=True)
     
-    tab_ia, tab_agenda, tab_lab = st.tabs(["⚡ INTELIGENCIA TÉCNICA",
+    tab_ia, tab_agenda, tab_lab = st.tabs(["⚡ INTELIGENCIA TÉCNICA", "👥 EXPEDIENTES CLIENTES", "🧪 LABORATORIO"])
+
+    # --- SECCIÓN IA ---
+    with tab_ia:
+        c1, c2 = st.columns([1, 2.5])
+        with c1:
+            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+            st.markdown("### Configuración")
+            marca = st.selectbox("Línea:", ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Casmara", "Otra"])
+            tipo = st.radio("Objetivo:", ["Fórmulas de Color", "Diagnóstico Piel", "Salud Capilar"])
+            if st.button("LOGOUT"):
+                st.session_state.auth = False
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+        
+        with c2:
+            try:
+                genai.configure(api_key=st.session_state.api_key)
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                if "chat" not in st.session_state: st.session_state.chat = []
+                
+                for msg in st.session_state.chat:
+                    with st.chat_message(msg["role"]): st.markdown(msg["content"])
+
+                if prompt := st.chat_input("Consulta a la IA (ej: Fórmula para un Balayage vainilla sobre base 5)"):
+                    st.session_state.chat.append({"role": "user", "content": prompt})
+                    with st.chat_message("user"): st.markdown(prompt)
+                    
+                    with st.spinner("DIAGNOSTICANDO..."):
+                        res = model.generate_content(f"Eres el mejor peluquero y esteticista del mundo. Marca {marca}. Responde a: {prompt}")
+                    
+                    with st.chat_message("assistant"):
+                        st.markdown(res.text)
+                        st.session_state.chat.append({"role": "assistant", "content": res.text})
+            except Exception as e:
+                st.error(f"Error de sistema: {e}")
+
+    # --- SECCIÓN AGENDA (PEPITA) ---
+    with tab_agenda:
+        st.markdown("## 📖 Expedientes de Belleza")
+        col_form, col_list = st.columns([1, 1])
+        
+        with col_form:
+            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+            st.markdown("### Nueva Ficha")
+            with st.form("c_form", clear_on_submit=True):
+                nombre = st.text_input("Nombre de la Cliente")
+                alergias = st.text_input("Alergias / Restricciones")
+                historial = st.text_area("Historial Técnico y Gustos")
+                if st.form_submit_button("REGISTRAR CLIENTE"):
+                    st.session_state.clientes[nombre] = {"alergias": alergias, "historial": historial}
+                    st.toast(f"{nombre} registrada!")
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+        with col_list:
+            for n, d in st.session_state.clientes.items():
+                st.markdown(f"""
+                <div class='client-chip'>
+                    <h3 style='margin:0; color:#8E5B5B;'>✨ {n}</h3>
+                    <p style='margin:5px 0;'><b>🔴 ALERGIAS:</b> {d['alergias']}</p>
+                    <p style='margin:0; color:#666;'><b>📓 HISTORIAL:</b> {d['historial']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+    # --- SECCIÓN LABORATORIO ---
+    with tab_lab:
+        st.markdown("## 🧪 El Alquimista")
+        col_m1, col_m2 = st.columns(2)
+        with col_m1:
+            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+            n_m = st.text_input("Nombre del Color Maestro")
+            f_m = st.text_area("Proporciones y Tiempos (ej: 30g 9.1 + 10g 10.22 + 60ml 20vol)")
+            if st.button("GUARDAR EN EL ARCHIVO"):
+                st.session_state.mezclas.append({"n": n_m, "f": f_m})
+            st.markdown("</div>", unsafe_allow_html=True)
+        with col_m2:
+            for m in st.session_state.mezclas:
+                with st.expander(f"🎨 {m['n']}"):
+                    st.write(m['f'])
