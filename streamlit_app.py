@@ -21,7 +21,7 @@ with st.sidebar:
 if api_key:
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
         # Instrucciones maestras (El cerebro)
         prompt_base = f"Eres ColorMaster AI, un experto colorista con 30 años de experiencia. " \
