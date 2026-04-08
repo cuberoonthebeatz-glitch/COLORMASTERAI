@@ -1,90 +1,105 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. CONFIGURACIÓN VISUAL (ESTÉTICA CHIC)
-st.set_page_config(page_title="ColorMaster & Beauty AI", page_icon="✨", layout="centered")
+# 1. CONFIGURACIÓN DE MARCA Y ESTÉTICA
+st.set_page_config(page_title="ColorMaster Pro AI", page_icon="✨", layout="centered")
 
-# CSS para personalizar el diseño (Colores pastel, bordes suaves y fuentes elegantes)
+# CSS Avanzado para estética "Chic & Minimal"
 st.markdown("""
     <style>
-    /* Fondo general */
-    .stApp {
-        background-color: #FFF9F9;
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Poppins', sans-serif;
+        background-color: #FCF7F7;
     }
-    /* Estilo de la barra lateral */
-    section[data-testid="stSidebar"] {
-        background-color: #F8E8E8 !important;
+    
+    /* Login Box */
+    .login-box {
+        background-color: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        text-align: center;
+        margin-top: 50px;
     }
-    /* Títulos y textos */
-    h1, h2, h3 {
-        color: #8E5B5B !important;
-        font-family: 'Inter', sans-serif;
-    }
-    /* Botones y inputs */
+    
+    /* Botones dorados */
     .stButton>button {
-        background-color: #D4A373;
-        color: white;
-        border-radius: 25px;
+        background: linear-gradient(135deg, #D4A373 0%, #B5835A 100%);
+        color: white !important;
+        border-radius: 30px !important;
         border: none;
-        padding: 10px 25px;
-        transition: 0.3s;
+        padding: 10px 30px !important;
+        font-weight: 600;
+        width: 100%;
     }
-    .stButton>button:hover {
-        background-color: #B5835A;
-        border: none;
-    }
-    /* Estilo de los globos de chat */
-    .stChatMessage {
-        border-radius: 15px;
-        margin-bottom: 10px;
-    }
+    
+    /* Ocultar barra de arriba de Streamlit */
+    header {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-# 2. CABECERA CON ESTILO
-st.title("✨ ColorMaster & Beauty AI")
-st.markdown("<p style='color: #B5835A; font-style: italic;'>Donde la ciencia del color se encuentra con el arte de la belleza.</p>", unsafe_allow_html=True)
-st.markdown("---")
+# 2. LÓGICA DE INICIO DE SESIÓN (LOGIN)
+if 'auth' not in st.session_state:
+    st.session_state.auth = False
 
-# 3. PANEL DE CONTROL (SIDEBAR)
-with st.sidebar:
-    st.markdown("<h2 style='text-align: center;'>🌸 Menú Beauty</h2>", unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/3465/3465066.png", width=100)
+if not st.session_state.auth:
+    # PANTALLA DE BIENVENIDA / LOGIN
+    st.markdown("<div class='login-box'>", unsafe_allow_html=True)
+    st.image("https://cdn-icons-png.flaticon.com/512/3465/3465066.png", width=80)
+    st.markdown("<h1 style='color: #8E5B5B;'>ColorMaster Pro</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #B5835A;'>Bienvenida al espacio exclusivo para profesionales de la belleza</p>", unsafe_allow_html=True)
     
-    api_key = st.text_input("🔑 Tu Licencia Digital:", type="password", placeholder="Pega tu clave aquí...")
+    api_key_input = st.text_input("Introduce tu Licencia Digital para acceder:", type="password")
     
-    st.divider()
-    
-    # Selector de especialidad
-    especialidad = st.radio("🎯 ¿En qué trabajamos hoy?", ["Colorimetría Capilar", "Estética y Piel", "Tratamientos Premium"])
-    
-    marca = st.selectbox("💄 Marca o Línea:", 
-                         ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Casmara", "Natura Bissé", "Otra"])
-    
-    st.divider()
-    st.caption("© 2024 ColorMaster Pro - Elegancia & Tecnología")
+    if st.button("Iniciar Sesión"):
+        if api_key_input:
+            st.session_state.api_key = api_key_input
+            st.session_state.auth = True
+            st.rerun()
+        else:
+            st.error("Por favor, introduce una licencia válida.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# 4. LÓGICA DE FUNCIONAMIENTO
-if api_key:
+else:
+    # 3. INTERFAZ DE LA APLICACIÓN (YA LOGUEADO)
+    
+    # Barra lateral más limpia
+    with st.sidebar:
+        st.markdown("<h2 style='color: #8E5B5B;'>🌸 Panel Principal</h2>", unsafe_allow_html=True)
+        st.divider()
+        marca = st.selectbox("Línea de trabajo:", ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Casmara", "Otra"])
+        especialidad = st.radio("Especialidad:", ["Colorimetría", "Estética Corporal/Facial", "Tricología"])
+        
+        if st.button("Cerrar Sesión"):
+            st.session_state.auth = False
+            st.rerun()
+
+    # Título del Chat
+    st.markdown(f"<h3 style='color: #8E5B5B;'>✨ Consultoría: {marca}</h3>", unsafe_allow_html=True)
+    
     try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        genai.configure(api_key=st.session_state.api_key)
+        # Ajuste a modelo Flash para mayor velocidad
+        model = genai.GenerativeModel('gemini-1.5-flash')
 
         if "messages" not in st.session_state:
-            st.session_state.messages = [{"role": "assistant", "content": f"¡Hola Pedro! Bienvenida a tu espacio de trabajo. ¿Qué reto de {especialidad} tenemos con {marca}?"}]
+            st.session_state.messages = [{"role": "assistant", "content": "Sesión iniciada. Soy tu experto personal, ¿qué reto tenemos hoy?"}]
 
+        # Mostrar historial
         for m in st.session_state.messages:
             with st.chat_message(m["role"]):
                 st.markdown(m["content"])
 
-        if prompt := st.chat_input("Escribe tu consulta..."):
+        # Entrada de chat
+        if prompt := st.chat_input("Escribe tu consulta técnica..."):
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            # Contexto ultra-detallado para la IA
-            contexto = f"Eres un consultor experto en {especialidad} trabajando con la marca {marca}. Tu tono es profesional, amable, servicial y elegante (estética chic). Ayuda al profesional con fórmulas, consejos técnicos o soluciones: {prompt}"
-            
+            # Petición a la IA
+            contexto = f"Eres un colorista y experto en estética de alto nivel. Usas la marca {marca}. Responde de forma técnica y elegante: {prompt}"
             response = model.generate_content(contexto)
             
             with st.chat_message("assistant"):
@@ -92,21 +107,6 @@ if api_key:
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
                 
     except Exception as e:
-        st.error("✨ Estamos preparando tu sesión... Google está activando tu llave.")
-        if "404" in str(e):
-            st.info("💡 Consejo: Tómate un café. Google tarda unos 30 min en activar llaves nuevas. ¡En nada estará lista!")
-else:
-    # Pantalla de bienvenida cuando no hay clave
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("""
-        ### Bienvenida al futuro del salón
-        Esta herramienta te ayuda a:
-        - Crear fórmulas de color perfectas.
-        - Analizar tipos de piel y tratamientos.
-        - Resolver dudas técnicas al instante.
-        """)
-    with col2:
-        st.image("https://img.freepik.com/vector-gratis/ilustracion-concepto-maquillaje_114360-2135.jpg", width=200)
-    
-    st.warning("👈 Para empezar, introduce tu Licencia Digital en el panel izquierdo.")
+        st.error(f"Error de conexión: {e}")
+        if st.button("Reintentar"):
+            st.rerun()
