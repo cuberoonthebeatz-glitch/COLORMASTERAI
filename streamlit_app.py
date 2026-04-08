@@ -1,81 +1,112 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. ESTÉTICA DE LA PÁGINA
-st.set_page_config(page_title="ColorMaster Pro AI", page_icon="✨", layout="centered")
+# 1. CONFIGURACIÓN VISUAL (ESTÉTICA CHIC)
+st.set_page_config(page_title="ColorMaster & Beauty AI", page_icon="✨", layout="centered")
 
-# CSS personalizado para cambiar colores (Peluquería de lujo)
+# CSS para personalizar el diseño (Colores pastel, bordes suaves y fuentes elegantes)
 st.markdown("""
     <style>
-    .main {
-        background-color: #fcfaf8;
+    /* Fondo general */
+    .stApp {
+        background-color: #FFF9F9;
     }
+    /* Estilo de la barra lateral */
+    section[data-testid="stSidebar"] {
+        background-color: #F8E8E8 !important;
+    }
+    /* Títulos y textos */
+    h1, h2, h3 {
+        color: #8E5B5B !important;
+        font-family: 'Inter', sans-serif;
+    }
+    /* Botones y inputs */
     .stButton>button {
-        background-color: #d4af37;
+        background-color: #D4A373;
         color: white;
-        border-radius: 20px;
+        border-radius: 25px;
+        border: none;
+        padding: 10px 25px;
+        transition: 0.3s;
     }
-    .stTextInput>div>div>input {
-        border-radius: 10px;
+    .stButton>button:hover {
+        background-color: #B5835A;
+        border: none;
+    }
+    /* Estilo de los globos de chat */
+    .stChatMessage {
+        border-radius: 15px;
+        margin-bottom: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. CABECERA
-st.title("✨ ColorMaster Pro AI")
-st.subheader("Asistente Avanzado para Coloristas")
+# 2. CABECERA CON ESTILO
+st.title("✨ ColorMaster & Beauty AI")
+st.markdown("<p style='color: #B5835A; font-style: italic;'>Donde la ciencia del color se encuentra con el arte de la belleza.</p>", unsafe_allow_html=True)
 st.markdown("---")
 
-# 3. BARRA LATERAL (Sidebar)
+# 3. PANEL DE CONTROL (SIDEBAR)
 with st.sidebar:
+    st.markdown("<h2 style='text-align: center;'>🌸 Menú Beauty</h2>", unsafe_allow_html=True)
     st.image("https://cdn-icons-png.flaticon.com/512/3465/3465066.png", width=100)
-    st.header("Panel de Control")
-    api_key = st.text_input("🔑 Licencia Digital:", type="password", help="Introduce tu clave AIza para activar.")
+    
+    api_key = st.text_input("🔑 Tu Licencia Digital:", type="password", placeholder="Pega tu clave aquí...")
     
     st.divider()
     
-    marca = st.selectbox("🛠️ Línea de Color:", 
-                         ["L'Oréal Professionnel", "Wella Professionals", "Schwarzkopf Igora", "Redken Shades EQ", "Sassoon", "Otra"])
+    # Selector de especialidad
+    especialidad = st.radio("🎯 ¿En qué trabajamos hoy?", ["Colorimetría Capilar", "Estética y Piel", "Tratamientos Premium"])
+    
+    marca = st.selectbox("💄 Marca o Línea:", 
+                         ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Casmara", "Natura Bissé", "Otra"])
     
     st.divider()
-    st.info("💡 **Consejo:** Si acabas de crear tu clave, Google puede tardar hasta 30-60 min en activarla. ¡Paciencia, maestro!")
+    st.caption("© 2024 ColorMaster Pro - Elegancia & Tecnología")
 
-# 4. CUERPO DEL CHAT
-st.write(f"🟢 **Sistema configurado para:** {marca}")
-
-if not api_key:
-    st.warning("⚠️ Esperando conexión... Introduce tu licencia en el panel izquierdo para empezar a trabajar.")
-    
-    # Simulación de cómo se vería un consejo
-    with st.expander("Ver ejemplo de consulta"):
-        st.write("¿Cómo consigo un 10.21 sobre una base naranja persistente?")
-else:
+# 4. LÓGICA DE FUNCIONAMIENTO
+if api_key:
     try:
         genai.configure(api_key=api_key)
-        # Usamos la ruta más compatible
-        model = genai.GenerativeModel('models/gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
         if "messages" not in st.session_state:
-            st.session_state.messages = [{"role": "assistant", "content": f"¡Hola Pedro! Soy tu asistente de {marca}. ¿Qué caso técnico tenemos hoy en el salón?"}]
+            st.session_state.messages = [{"role": "assistant", "content": f"¡Hola Pedro! Bienvenida a tu espacio de trabajo. ¿Qué reto de {especialidad} tenemos con {marca}?"}]
 
         for m in st.session_state.messages:
             with st.chat_message(m["role"]):
                 st.markdown(m["content"])
 
-        if prompt := st.chat_input("Escribe aquí tu duda técnica..."):
+        if prompt := st.chat_input("Escribe tu consulta..."):
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            # Llamada a la IA
-            response = model.generate_content(f"Eres experto colorista senior de {marca}. Responde: {prompt}")
+            # Contexto ultra-detallado para la IA
+            contexto = f"Eres un consultor experto en {especialidad} trabajando con la marca {marca}. Tu tono es profesional, amable, servicial y elegante (estética chic). Ayuda al profesional con fórmulas, consejos técnicos o soluciones: {prompt}"
+            
+            response = model.generate_content(contexto)
             
             with st.chat_message("assistant"):
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
                 
     except Exception as e:
-        # Mostramos un error más elegante
-        st.error("🚀 El motor de Google se está calentando. Prueba de nuevo en unos minutos.")
+        st.error("✨ Estamos preparando tu sesión... Google está activando tu llave.")
         if "404" in str(e):
-            st.info("Confirmado: Google aún no ha activado tu clave. Vamos a esperar un poco.")
+            st.info("💡 Consejo: Tómate un café. Google tarda unos 30 min en activar llaves nuevas. ¡En nada estará lista!")
+else:
+    # Pantalla de bienvenida cuando no hay clave
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""
+        ### Bienvenida al futuro del salón
+        Esta herramienta te ayuda a:
+        - Crear fórmulas de color perfectas.
+        - Analizar tipos de piel y tratamientos.
+        - Resolver dudas técnicas al instante.
+        """)
+    with col2:
+        st.image("https://img.freepik.com/vector-gratis/ilustracion-concepto-maquillaje_114360-2135.jpg", width=200)
+    
+    st.warning("👈 Para empezar, introduce tu Licencia Digital en el panel izquierdo.")
