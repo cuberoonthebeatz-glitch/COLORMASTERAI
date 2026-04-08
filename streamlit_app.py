@@ -12,9 +12,8 @@ with st.sidebar:
 if api_key:
     try:
         genai.configure(api_key=api_key)
-        
-        # USAMOS LA RUTA COMPLETA PARA FORZAR EL FUNCIONAMIENTO
-        model = genai.GenerativeModel('models/gemini-1.5-flash')
+        # ESTE ES EL NOMBRE QUE GOOGLE PIDE AHORA
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -28,14 +27,13 @@ if api_key:
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            # Respuesta
-            response = model.generate_content(f"Soy experto colorista de {marca}. {prompt}")
+            response = model.generate_content(f"Eres experto colorista de {marca}. {prompt}")
             
             with st.chat_message("assistant"):
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
                 
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Aviso: {e}")
 else:
-    st.warning("👈 Introduce la clave para arrancar.")
+    st.warning("👈 Esperando la clave...")
