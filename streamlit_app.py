@@ -2,152 +2,127 @@ import streamlit as st
 import google.generativeai as genai
 
 # 1. SETUP DE ALTO RENDIMIENTO
-st.set_page_config(page_title="ColorMaster Pro 2026", page_icon="💄", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="ColorMaster Pro", page_icon="💄", layout="wide", initial_sidebar_state="collapsed")
 
-# 2. MOTOR ESTRÉMICO DE DISEÑO (Identidad Visual Única)
+# 2. IDENTIDAD VISUAL (GUMMY LUXURY 2026)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
     
     :root {
         --primary: #FF85A1;
-        --accent: #D4A373;
-        --dark: #1A1A1A;
-        --bg: #FDFBFA;
+        --gold: #D4A373;
+        --dark: #121212;
     }
 
-    .stApp {
-        background: var(--bg);
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    /* OCULTAR INTERFAZ NATIVA */
+    .stApp { background-color: #FDFBFA; font-family: 'Plus Jakarta Sans', sans-serif; }
     header, footer, [data-testid="stSidebarNav"] {display: none !important;}
-    .block-container {padding: 1rem 3rem !important;}
 
-    /* LOGIN SOFISTICADO */
+    /* LOGIN CARD */
     .auth-card {
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(30px);
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: white;
         border-radius: 40px;
-        padding: 50px;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
         text-align: center;
-        max-width: 450px;
+        max-width: 400px;
         margin: 10vh auto;
+        border: 1px solid #F0F0F0;
     }
 
-    /* BOTONES NEUMÓRFICOS (Efecto Chuchería/Esponjoso) */
+    /* BOTONES ESPONJOSOS (GUMMY) */
     .stButton>button {
         background: var(--dark) !important;
         color: white !important;
-        border-radius: 24px !important;
+        border-radius: 20px !important;
         border: none !important;
-        padding: 18px 40px !important;
+        padding: 15px 30px !important;
         font-weight: 600 !important;
-        letter-spacing: -0.5px !important;
-        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1) !important;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        transition: all 0.3s ease !important;
         width: 100%;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
     }
 
     .stButton>button:hover {
-        transform: translateY(-3px) scale(1.02) !important;
+        transform: translateY(-3px);
         background: var(--primary) !important;
-        box-shadow: 0 15px 30px rgba(255, 133, 161, 0.3) !important;
+        box-shadow: 0 12px 25px rgba(255, 133, 161, 0.3) !important;
     }
 
-    /* TARJETAS DINÁMICAS (Glassmorphism) */
-    .panel {
-        background: white;
-        border-radius: 32px;
-        padding: 24px;
+    /* PANELES DE TRABAJO */
+    .panel-glass {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 30px;
+        padding: 25px;
         border: 1px solid #F0F0F0;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.02);
-        transition: all 0.3s ease;
-    }
-    
-    .panel:hover {
-        box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-        border-color: var(--primary);
+        margin-bottom: 20px;
     }
 
-    /* CHAT DE NUEVA GENERACIÓN */
-    .stChatMessage {
-        background: #F9F9F9 !important;
-        border-radius: 24px !important;
-        border: none !important;
-        padding: 20px !important;
-        margin-bottom: 15px !important;
-    }
-
-    /* TITULOS IDENTIDAD */
-    .brand {
-        font-size: 48px;
+    .brand-logo {
+        font-size: 42px;
         font-weight: 800;
         letter-spacing: -2px;
         color: var(--dark);
-        margin-bottom: 0px;
+        margin-bottom: 5px;
     }
-    
-    .dot { color: var(--primary); }
+    .brand-dot { color: var(--primary); }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. LÓGICA DE ESTADO
+# 3. LÓGICA DE ESTADO (CORRECCIÓN DE ERROR)
 if 'auth' not in st.session_state: st.session_state.auth = False
-if 'clientes' not in st.session_state: st.session_state.clientes = []
+# Forzamos que sea una lista desde el principio
+if 'clientes' not in st.session_state or isinstance(st.session_state.clientes, dict):
+    st.session_state.clientes = []
 
-# 4. PANTALLA DE ACCESO (Vibe 2026)
+# 4. PANTALLA DE ACCESO
 if not st.session_state.auth:
-    st.markdown("""
-        <div class='auth-card'>
-            <div class='brand'>ColorMaster<span class='dot'>.</span></div>
-            <p style='color:#888; margin-bottom:40px;'>Inteligencia Creativa para el Salón Moderno</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='brand-logo'>ColorMaster<span class='brand-dot'>.</span></div>", unsafe_allow_html=True)
+    st.markdown("<p style='color:#888;'>Creative Intelligence System</p>", unsafe_allow_html=True)
     
-    col_l, col_c, col_r = st.columns([1, 1.5, 1])
-    with col_c:
-        api_key = st.text_input("LICENSE_KEY", type="password", placeholder="Acceso VIP")
-        if st.button("ENTRAR AL ECOSISTEMA"):
-            if api_key:
-                st.session_state.api_key = api_key
-                st.session_state.auth = True
-                st.rerun()
+    api_key = st.text_input("LICENSE_KEY", type="password", placeholder="Introduce tu acceso...")
+    if st.button("ACCEDER AL ECOSISTEMA"):
+        if api_key:
+            st.session_state.api_key = api_key
+            st.session_state.auth = True
+            st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
 else:
-    # 5. DASHBOARD INTEGRADO (MÁXIMA UTILIDAD)
-    st.markdown("<div class='brand' style='font-size:28px;'>CM<span class='dot'>.</span></div>", unsafe_allow_html=True)
+    # 5. DASHBOARD PROFESIONAL
+    st.markdown("<div class='brand-logo' style='font-size:24px; padding-left:20px;'>CM<span class='brand-dot'>.</span></div>", unsafe_allow_html=True)
     
-    col_nav, col_main = st.columns([1, 3.5], gap="large")
+    col_nav, col_main = st.columns([1, 3.5], gap="medium")
 
     with col_nav:
         st.markdown("### 🛠️ Herramientas")
-        marca = st.selectbox("Marca", ["L'Oréal", "Wella", "Schwarzkopf", "Redken", "Otra"])
+        marca = st.selectbox("Línea", ["L'Oréal", "Wella", "Schwarzkopf", "Redken", "Otra"])
         
         with st.expander("👤 NUEVA CLIENTE", expanded=False):
             nombre = st.text_input("Nombre")
             notas = st.text_area("Notas (Alergias/Historial)")
             if st.button("Guardar Ficha"):
-                st.session_state.clientes.append({"n": nombre, "h": notas})
-                st.toast("Cliente Registrada")
+                if nombre:
+                    st.session_state.clientes.append({"n": nombre, "h": notas})
+                    st.success("Guardado")
+                    st.rerun()
 
         st.markdown("---")
         st.markdown("### 📋 Agenda")
-        for c in st.session_state.clientes:
-            st.markdown(f"**{c['n']}**")
-            st.caption(c['h'])
-            
+        for idx, c in enumerate(st.session_state.clientes):
+            with st.container():
+                st.markdown(f"**{c['n']}**")
+                st.caption(f"📝 {c['h']}")
+        
         if st.button("SALIR"):
             st.session_state.auth = False
             st.rerun()
 
     with col_main:
-        # SISTEMA DE IA INTEGRADO
-        st.markdown("<div class='panel'>", unsafe_allow_html=True)
-        st.markdown("#### 🤖 Asistente de Diagnóstico")
+        # CHAT DINÁMICO
+        st.markdown("<div class='panel-glass'>", unsafe_allow_html=True)
+        st.markdown("#### 🤖 Consulta Técnica")
         
         try:
             genai.configure(api_key=st.session_state.api_key)
@@ -155,18 +130,17 @@ else:
             
             if "msgs" not in st.session_state: st.session_state.msgs = []
             
-            # Área de chat con scroll controlado para evitar lag
-            chat_container = st.container(height=450, border=False)
+            chat_container = st.container(height=500, border=False)
             with chat_container:
                 for m in st.session_state.msgs:
                     with st.chat_message(m["role"]): st.markdown(m["content"])
 
-            if p := st.chat_input("¿Qué técnica vamos a aplicar hoy?"):
+            if p := st.chat_input("¿Qué caso vamos a resolver hoy?"):
                 st.session_state.msgs.append({"role": "user", "content": p})
                 with chat_container:
                     with st.chat_message("user"): st.markdown(p)
                 
-                contexto = f"Eres una IA de élite en peluquería. Marca: {marca}. Responde rápido y con estilo profesional. {p}"
+                contexto = f"Eres una IA de élite en peluquería y estética. Marca: {marca}. Responde de forma técnica y brillante. {p}"
                 response = model.generate_content(contexto)
                 
                 st.session_state.msgs.append({"role": "assistant", "content": response.text})
@@ -174,13 +148,5 @@ else:
                     with st.chat_message("assistant"): st.markdown(response.text)
                     
         except Exception as e:
-            st.error(f"Error de sistema: {e}")
+            st.error(f"Sistema en mantenimiento: {e}")
         st.markdown("</div>", unsafe_allow_html=True)
-
-        # SECCIÓN DE MEZCLAS RÁPIDAS (Debajo del chat)
-        st.markdown("<br>", unsafe_allow_html=True)
-        col_m1, col_m2 = st.columns(2)
-        with col_m1:
-            st.markdown("<div class='panel'><b>🧪 Mezcla del Momento</b><br>Usa el chat para pedir fórmulas y anótalas aquí.</div>", unsafe_allow_html=True)
-        with col_m2:
-            st.markdown("<div class='panel'><b>📢 Novedades 2026</b><br>Tendencias: 'Butter Gloss' y 'Mushroom Blonde'.</div>", unsafe_allow_html=True)
