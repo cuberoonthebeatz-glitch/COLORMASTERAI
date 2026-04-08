@@ -105,4 +105,60 @@ if not st.session_state.auth:
     st.markdown("<div class='login-container'>", unsafe_allow_html=True)
     st.image("https://cdn-icons-png.flaticon.com/512/3465/3465066.png", width=70)
     st.markdown("<p class='main-title'>ColorMaster Pro</p>", unsafe_allow_html=True)
-    st.markdown("<p class='subtitle'>Tu rincón dulce de creatividad</p>", unsafe_allow
+    st.markdown("<p class='subtitle'>Tu rincón dulce de creatividad</p>", unsafe_allow_html=True)
+    api_key_input = st.text_input("Licencia (API Key):", type="password", placeholder="Pega tu código aquí...")
+    st.divider()
+    if st.button("ENTRAR AL SALÓN"):
+        if api_key_input:
+            st.session_state.api_key = api_key_input
+            st.session_state.auth = True
+            st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+else:
+    # 3. INTERFAZ DE TRABAJO
+    with st.sidebar:
+        st.markdown("<h2 style='color: #8E5B5B; text-align: center;'>Ajustes 🍬</h2>", unsafe_allow_html=True)
+        st.divider()
+        marca = st.selectbox("Marca:", ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken", "Otra"])
+        especialidad = st.radio("Modo:", ["Colorimetría", "Estética", "Tricología"])
+        st.divider()
+        if st.button("Cerrar Sesión"):
+            st.session_state.auth = False
+            st.rerun()
+
+    # Título principal moderno
+    st.markdown(f"### ✨ {especialidad} | {marca}")
+    st.markdown("<p style='color: #B5835A; font-size: 14px; margin-top: -15px;'>Tu experto personal está listo.</p>", unsafe_allow_html=True)
+    
+    try:
+        genai.configure(api_key=st.session_state.api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+
+        # Mostrar chat
+        for m in st.session_state.messages:
+            with st.chat_message(m["role"]):
+                st.markdown(m["content"])
+
+        # Entrada de texto (Chat)
+        if prompt := st.chat_input("Escribe tu caso técnico..."):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            # Prompt técnico elegante
+            contexto = f"Eres un experto colorista y esteticista de alto nivel, profesional pero amable. Usas la marca {marca}. Especialidad: {especialidad}. Responde de forma técnica pero accesible, como si estuvieras en un salón chic. {prompt}"
+            
+            # Generar respuesta con spinner
+            with st.spinner("Pensando tu fórmula mágica..."):
+                response = model.generate_content(contexto)
+            
+            with st.chat_message("assistant"):
+                st.markdown(response.text)
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
+                
+    except Exception as e:
+        st.error(f"Error de conexión: {e}")
