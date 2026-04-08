@@ -1,150 +1,148 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. CONFIGURACIÓN DE IMPACTO
-st.set_page_config(page_title="ColorMaster X", page_icon="🔥", layout="wide")
+# 1. ENGINE CONFIG
+st.set_page_config(page_title="ColorMaster Black", page_icon="🖤", layout="wide")
 
-# 2. ESTÉTICA RADICAL (NEO-POP INDUSTRIAL)
+# 2. EL ADN VISUAL (CSS DE ÉLITE)
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;800&family=Instrument+Sans:wght@400;600&display=swap');
     
-    /* Fondo con Personalidad */
+    :root {
+        --bg-color: #050505;
+        --card-bg: #0f0f0f;
+        --accent: #FF3366;
+        --text: #ffffff;
+    }
+
     .stApp {
-        background-color: #0F0F0F;
-        background-image: radial-gradient(#1a1a1a 2px, transparent 2px);
-        background-size: 30px 30px;
-        font-family: 'Space Grotesk', sans-serif;
-        color: white;
+        background-color: var(--bg-color);
+        color: var(--text);
+        font-family: 'Instrument Sans', sans-serif;
     }
 
     header, footer {visibility: hidden;}
 
-    /* Logo Explosivo */
-    .logo-vanguard {
-        font-family: 'Syncopate', sans-serif;
-        font-size: 80px;
-        line-height: 0.8;
-        background: linear-gradient(135deg, #FF0055, #FF5500);
+    /* LOGO IMPACTO */
+    .hero-text {
+        font-family: 'Bricolage Grotesque', sans-serif;
+        font-size: clamp(40px, 8vw, 100px);
+        font-weight: 800;
+        line-height: 0.9;
+        letter-spacing: -4px;
+        background: linear-gradient(to bottom, #fff 30%, #444 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 20px;
-        text-transform: uppercase;
     }
 
-    /* Paneles de Neón */
-    .neon-panel {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 0 20px rgba(255, 0, 85, 0.1);
+    /* CONTENEDORES TIPO APP */
+    .app-panel {
+        background: var(--card-bg);
+        border: 1px solid #222;
+        border-radius: 24px;
+        padding: 24px;
+        transition: border 0.3s ease;
+    }
+    .app-panel:hover {
+        border-color: var(--accent);
     }
 
-    /* Botones que "Explotan" */
+    /* BOTONES LUXURY */
     .stButton>button {
-        background: #FF0055 !important;
-        color: white !important;
+        background: white !important;
+        color: black !important;
+        border-radius: 100px !important;
         border: none !important;
-        border-radius: 10px !important;
-        font-family: 'Syncopate', sans-serif !important;
-        font-size: 14px !important;
-        padding: 20px !important;
+        font-weight: 600 !important;
+        padding: 1rem 2rem !important;
         width: 100% !important;
-        transition: 0.3s !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
-
     .stButton>button:hover {
-        background: #FF5500 !important;
-        box-shadow: 0 0 30px #FF0055 !important;
-        transform: scale(1.02);
+        background: var(--accent) !important;
+        color: white !important;
+        transform: scale(0.98);
     }
 
-    /* Chat Estilo Cyberpunk */
+    /* CHAT MINIMALISTA */
     .stChatMessage {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-left: 5px solid #FF0055 !important;
-        border-radius: 10px !important;
-        margin-bottom: 10px;
+        background: #151515 !important;
+        border: 1px solid #222 !important;
+        border-radius: 18px !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. LÓGICA DE DATOS
+# 3. SESIÓN
 if 'auth' not in st.session_state: st.session_state.auth = False
-if 'clientes' not in st.session_state: st.session_state.clientes = []
+if 'db' not in st.session_state: st.session_state.db = []
 
-# 4. LOGIN RADICAL
+# 4. ACCESO EXCLUSIVO
 if not st.session_state.auth:
-    col1, col2 = st.columns([1.5, 1])
-    with col1:
-        st.markdown("<div style='margin-top:10vh;'>", unsafe_allow_html=True)
-        st.markdown("<p class='logo-vanguard'>COLOR<br>MASTER<br>X</p>", unsafe_allow_html=True)
-        st.markdown("<h3 style='color:#FF0055;'>FUTURE OF BEAUTY. NOW.</h3>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-    with col2:
-        st.markdown("<div class='neon-panel' style='margin-top:15vh;'>", unsafe_allow_html=True)
-        api_key = st.text_input("ENTER API KEY", type="password")
-        if st.button("UNLOCK SYSTEM"):
-            if api_key:
-                st.session_state.api_key = api_key
+    st.markdown("<div style='margin-top:10vh; text-align:center;'>", unsafe_allow_html=True)
+    st.markdown("<h1 class='hero-text'>COLOR<br>MASTER.</h1>", unsafe_allow_html=True)
+    
+    col_l, col_c, col_r = st.columns([1, 1.2, 1])
+    with col_c:
+        key = st.text_input("PASSWORD", type="password")
+        if st.button("ACCEDER AL SISTEMA"):
+            if key:
+                st.session_state.api_key = key
                 st.session_state.auth = True
                 st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 else:
-    # 5. WORKSPACE DINÁMICO
-    st.markdown("<p class='logo-vanguard' style='font-size:30px;'>CMX</p>", unsafe_allow_html=True)
+    # 5. WORKSPACE PROFESIONAL
+    st.markdown("<h2 style='font-family:Bricolage Grotesque; letter-spacing:-1px;'>DASHBOARD.</h2>", unsafe_allow_html=True)
     
-    c_side, c_main = st.columns([1, 2.5])
+    c1, c2 = st.columns([1, 2.5], gap="medium")
 
-    with c_side:
-        with st.container(border=True):
-            st.markdown("### 🎚️ CONTROL")
-            marca = st.selectbox("MARCA", ["L'Oréal", "Wella", "Schwarzkopf", "Redken"])
-            
-            with st.expander("👤 AGENDAR CLIENTE"):
-                n = st.text_input("NOMBRE")
-                h = st.text_area("HISTORIAL")
-                if st.button("GUARDAR"):
-                    st.session_state.clientes.append({"n": n, "h": h})
-            
-            st.divider()
-            for cli in st.session_state.clientes:
-                st.markdown(f"🔴 **{cli['n']}**")
-            
-            if st.button("LOGOUT"):
-                st.session_state.auth = False
-                st.rerun()
-
-    with c_main:
-        st.markdown("<div class='neon-panel'>", unsafe_allow_html=True)
-        st.markdown("#### 💬 CONEXIÓN IA ACTIVA")
+    with c1:
+        st.markdown("<div class='app-panel'>", unsafe_allow_html=True)
+        marca = st.selectbox("LABORATORIO:", ["L'Oréal Pro", "Wella", "Schwarzkopf", "Redken"])
         
-        # Intentar respuesta forzada
+        with st.expander("📝 FICHA CLIENTE"):
+            nom = st.text_input("Nombre")
+            obs = st.text_area("Notas")
+            if st.button("GUARDAR"):
+                st.session_state.db.append({"n": nom, "o": obs})
+                st.rerun()
+        
+        st.markdown("---")
+        for item in st.session_state.db:
+            st.markdown(f"**{item['n']}**")
+            st.caption(item['o'])
+        
+        if st.button("CERRAR SESIÓN"):
+            st.session_state.auth = False
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with c2:
+        st.markdown("<div class='app-panel'>", unsafe_allow_html=True)
+        
         try:
             genai.configure(api_key=st.session_state.api_key)
-            # USAMOS EL MODELO FLASH POR DEFECTO
             model = genai.GenerativeModel('gemini-1.5-flash')
             
-            if "msgs" not in st.session_state: st.session_state.msgs = []
+            if "chat" not in st.session_state: st.session_state.chat = []
             
-            for m in st.session_state.msgs:
+            for m in st.session_state.chat:
                 with st.chat_message(m["role"]): st.markdown(m["content"])
 
-            if p := st.chat_input("¿Qué caso vamos a destruir hoy?"):
-                st.session_state.msgs.append({"role": "user", "content": p})
+            if p := st.chat_input("Escribe tu consulta técnica..."):
+                st.session_state.chat.append({"role": "user", "content": p})
                 with st.chat_message("user"): st.markdown(p)
                 
-                # Respuesta de la IA
-                response = model.generate_content(f"Actúa como el mejor colorista del mundo. Marca {marca}. Respuesta corta y técnica: {p}")
+                # LLAMADA A LA IA
+                response = model.generate_content(f"Eres el mejor peluquero del mundo. Marca {marca}. Responde técnico y directo: {p}")
                 
-                if response:
-                    st.session_state.msgs.append({"role": "assistant", "content": response.text})
-                    with st.chat_message("assistant"): st.markdown(response.text)
-                else:
-                    st.error("La IA no ha podido generar respuesta. Revisa tu clave.")
+                st.session_state.chat.append({"role": "assistant", "content": response.text})
+                with st.chat_message("assistant"): st.markdown(response.text)
                     
         except Exception as e:
-            st.error(f"ERROR DE CONEXIÓN: {e}")
+            st.error(f"Error: {e}")
         st.markdown("</div>", unsafe_allow_html=True)
