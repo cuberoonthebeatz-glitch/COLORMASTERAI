@@ -11,11 +11,10 @@ with st.sidebar:
 
 if api_key:
     try:
-        # Configuración ultra simple
         genai.configure(api_key=api_key)
         
-        # Seleccionamos el modelo más nuevo pero sin rutas complejas
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # USAMOS LA RUTA COMPLETA PARA FORZAR EL FUNCIONAMIENTO
+        model = genai.GenerativeModel('models/gemini-1.5-flash')
 
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -24,13 +23,13 @@ if api_key:
             with st.chat_message(m["role"]):
                 st.markdown(m["content"])
 
-        if prompt := st.chat_input("Escribe tu duda técnica aquí..."):
+        if prompt := st.chat_input("Escribe tu duda aquí..."):
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            # Respuesta directa
-            response = model.generate_content(f"Soy peluquero y uso {marca}. {prompt}")
+            # Respuesta
+            response = model.generate_content(f"Soy experto colorista de {marca}. {prompt}")
             
             with st.chat_message("assistant"):
                 st.markdown(response.text)
@@ -39,4 +38,4 @@ if api_key:
     except Exception as e:
         st.error(f"Error: {e}")
 else:
-    st.warning("👈 Introduce tu llave para activar.")
+    st.warning("👈 Introduce la clave para arrancar.")
